@@ -4,19 +4,19 @@ project(m2-server)
 
 get_filename_component(M2_ROOT "${CMAKE_SOURCE_DIR}" ABSOLUTE)
 
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     set(M2_DEBUG ON)
     set(M2_BIN_DIR "${M2_ROOT}/bin/Debug")
     set(M2_LIB_DIR "${M2_ROOT}/bin/Debug")
     set(CMAKE_CONFIGURATION_TYPES "Debug" CACHE STRING "" FORCE)
-elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+elseif (${CMAKE_BUILD_TYPE} STREQUAL "Release")
     set(M2_RELEASE ON)
     set(M2_BIN_DIR "${M2_ROOT}/bin/Release")
     set(M2_LIB_DIR "${M2_ROOT}/bin/Release")
     set(CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
-else()
+else ()
     message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE value (Debug|Release)")
-endif()
+endif ()
 
 message(STATUS "binaries output: " ${M2_BIN_DIR})
 message(STATUS "libraries output: " ${M2_LIB_DIR})
@@ -50,34 +50,39 @@ include(cotire)
 
 # -------------------------    boost   --------------------------
 find_package(Boost COMPONENTS
-    system
-    REQUIRED)
+        system
+        REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 
 # ----------------------- source groups  ------------------------
 macro(set_source_group group_name root_dir ${ARGN})
     get_filename_component(_path ${root_dir} ABSOLUTE)
-    foreach(_source IN ITEMS ${ARGN})
+    foreach (_source IN ITEMS ${ARGN})
         get_filename_component(_source_path "${_source}" PATH)
         string(REPLACE "${_path}" "" _source_trimmed "${_source_path}")
         set(_source_group "${group_name}${_source_trimmed}")
         string(REPLACE "/" "\\" _source_group "${_source_group}")
         source_group("${_source_group}" FILES "${_source}")
-    endforeach()
+    endforeach ()
 endmacro()
 
 
 # -------------------------   sources   -------------------------
 set(HEADERS
-    stdafx.h
-    )
+        stdafx.h
+        )
 
 set(SOURCES
-    src/stdafx.cpp
-
-    src/main.cpp
-    )
+        src/stdafx.cpp
+        src/Request/Request.cpp
+        src/Request/RegisterUser.cpp
+        src/Response/Response.cpp
+        src/Response/RepnonseOK.cpp
+        src/JsonRequestParser.cpp
+        src/Request/LoginUser.cpp
+        src/main.cpp
+        )
 
 set_source_group("sources" ${SUBPROJECT_ROOT} ${HEADERS} ${SOURCES})
 
@@ -89,4 +94,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT s
 cotire(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME}
-    ${Boost_LIBRARIES})
+        ${Boost_LIBRARIES})
